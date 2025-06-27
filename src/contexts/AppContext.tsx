@@ -1,0 +1,85 @@
+import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { CartItem, User, Pizza } from '../types';
+
+interface AppState {
+  cart: CartItem[];
+  user: User | null;
+  isAuthenticated: boolean;
+}
+
+type AppAction =
+  | { type: 'ADD_TO_CART'; payload: CartItem }
+  | { type: 'REMOVE_FROM_CART'; payload: number }
+  | { type: 'UPDATE_CART_ITEM'; payload: { index: number; item: CartItem } }
+  | { type: 'CLEAR_CART' }
+  | { type: 'SET_USER'; payload: User }
+  | { type: 'LOGOUT' };
+
+const initialState: AppState = {
+  cart: [],
+  user: null,
+  isAuthenticated: false,
+};
+
+const AppContext = createContext<{
+  state: AppState;
+  dispatch: React.Dispatch<AppAction>;
+} | null>(null);
+
+function appReducer(state: AppState, action: AppAction): AppState {
+  switch (action.type) {
+    case 'ADD_TO_CART':
+      const existingIndex = state.cart.findIndex(
+        item => item.pizza.id === action.payload.pizza.id && item.size === action.payload.size
+      );
+      
+      if (existingIndex >= 0) {
+        const updatedCart = [...state.cart];
+        updatedCart[existingIndex].quantity += action.payload.quantity;
+        return { ...state, cart: updatedCart };
+      }
+      
+      return { ...state, cart: [...state.cart, action.payload] };
+    
+    case 'REMOVE_FROM_CART':
+      return {
+        ...state,
+        cart: state.cart.filter((_, index) => index !== action.payload)
+      };
+    
+    case 'UPDATE_CART_ITEM':
+      const updatedCart = [...state.cart];
+      updatedCart[action.payload.index] = action.payload.item;
+      return { ...state, cart: updatedCart };
+    
+    case 'CLEAR_CART':
+      return { ...state, cart: [] };
+    
+    case 'SET_USER':
+      return { ...state, user: action.payload, isAuthenticated: true };
+    
+    case 'LOGOUT':
+      return { ...state, user: null, isAuthenticated: false };
+    
+    default:
+      return state;
+  }
+}
+
+export function AppProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(appReducer, initialState);
+
+  return (
+    <AppContext.Provider value={{ state, dispatch }}>
+      {children}
+    </AppContext.Provider>
+  );
+}
+
+export function useApp() {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useApp must be used within an AppProvider');
+  }
+  return context;
+}

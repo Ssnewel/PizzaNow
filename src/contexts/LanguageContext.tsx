@@ -1,0 +1,641 @@
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+export type Language = 'ro' | 'ru' | 'en';
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: string) => string;
+  translateProduct: (product: any, field: string) => string;
+}
+
+const translations = {
+  en: {
+    // Header
+    'nav.home': 'Home',
+    'nav.menu': 'Menu',
+    'nav.about': 'About',
+    'nav.contact': 'Contact',
+    'nav.signin': 'Sign In',
+    'nav.signup': 'Sign Up',
+    
+    // Home page
+    'home.hero.title': 'Authentic Italian Pizza',
+    'home.hero.subtitle': 'Delivered Fresh',
+    'home.hero.description': 'Wood-fired perfection made with love and the finest ingredients. Family recipes passed down for generations.',
+    'home.hero.order': 'Order Now',
+    'home.hero.story': 'Our Story',
+    'home.features.title': 'Why Choose Tony\'s?',
+    'home.features.subtitle': 'We\'re committed to delivering the best pizza experience with quality ingredients and exceptional service.',
+    'home.features.fast': 'Fast Delivery',
+    'home.features.fast.desc': 'Hot and fresh pizza delivered in 30 minutes or less',
+    'home.features.chefs': 'Expert Chefs',
+    'home.features.chefs.desc': 'Authentic Italian recipes from experienced pizzaiolos',
+    'home.features.quality': 'Premium Quality',
+    'home.features.quality.desc': 'Only the finest ingredients and fresh daily dough',
+    'home.features.delivery': 'Free Delivery',
+    'home.features.delivery.desc': 'Free delivery on orders over 500 MDL in our delivery area',
+    'home.featured.title': 'Featured Pizzas',
+    'home.featured.subtitle': 'Try our most popular pizzas, loved by customers and crafted with care.',
+    'home.featured.viewmenu': 'View Full Menu',
+    'home.cta.title': 'Hungry? Order Now!',
+    'home.cta.subtitle': 'Fresh, hot pizza delivered to your door in 30 minutes or less.',
+    'home.cta.start': 'Start Your Order',
+    
+    // Menu page
+    'menu.title': 'Our Menu',
+    'menu.subtitle': 'Discover our delicious selection of authentic Italian pizzas, made with fresh ingredients and traditional techniques.',
+    'menu.search': 'Search pizzas, ingredients...',
+    'menu.showing': 'Showing',
+    'menu.pizzas': 'pizzas',
+    'menu.pizza': 'pizza',
+    'menu.for': 'for',
+    'menu.in': 'in',
+    'menu.noresults': 'No pizzas found',
+    'menu.noresults.desc': 'Try adjusting your search terms or category filter.',
+    'menu.clear': 'Clear Filters',
+    
+    // Pizza card
+    'pizza.ingredients': 'Ingredients:',
+    'pizza.size': 'Size',
+    'pizza.small': 'Small',
+    'pizza.medium': 'Medium',
+    'pizza.large': 'Large',
+    'pizza.qty': 'Qty:',
+    'pizza.addtocart': 'Add to Cart',
+    
+    // Cart
+    'cart.title': 'Your Cart',
+    'cart.empty': 'Your cart is empty',
+    'cart.empty.desc': 'Looks like you haven\'t added any delicious pizzas to your cart yet.',
+    'cart.browse': 'Browse Menu',
+    'cart.items': 'Order Items',
+    'cart.size': 'Size:',
+    'cart.each': 'each',
+    'cart.summary': 'Order Summary',
+    'cart.subtotal': 'Subtotal',
+    'cart.tax': 'Tax',
+    'cart.delivery': 'Delivery Fee',
+    'cart.free': 'FREE',
+    'cart.freedelivery': 'Free delivery on orders over 500 MDL',
+    'cart.total': 'Total',
+    'cart.checkout': 'Proceed to Checkout',
+    'cart.continue': 'Continue Shopping',
+    
+    // Auth
+    'auth.welcome': 'Welcome back!',
+    'auth.signin.subtitle': 'Sign in to your account to continue ordering',
+    'auth.signup.subtitle': 'Create your account to start ordering delicious pizzas',
+    'auth.email': 'Email Address',
+    'auth.password': 'Password',
+    'auth.confirmpassword': 'Confirm Password',
+    'auth.firstname': 'First Name',
+    'auth.lastname': 'Last Name',
+    'auth.phone': 'Phone Number',
+    'auth.remember': 'Remember me',
+    'auth.forgot': 'Forgot password?',
+    'auth.signin': 'Sign In',
+    'auth.signup': 'Sign Up',
+    'auth.or': 'Or continue with',
+    'auth.google': 'Google',
+    'auth.facebook': 'Facebook',
+    'auth.noaccount': 'Don\'t have an account?',
+    'auth.hasaccount': 'Already have an account?',
+    'auth.signuphere': 'Sign up here',
+    'auth.signinhere': 'Sign in here',
+    'auth.guest': 'Continue as guest →',
+    
+    // Checkout
+    'checkout.title': 'Checkout',
+    'checkout.contact': 'Contact Information',
+    'checkout.delivery': 'Delivery Address',
+    'checkout.payment': 'Payment Method',
+    'checkout.review': 'Review Order',
+    'checkout.street': 'Street Address',
+    'checkout.city': 'City',
+    'checkout.state': 'State/Region',
+    'checkout.zip': 'ZIP Code',
+    'checkout.instructions': 'Special Instructions',
+    'checkout.instructions.placeholder': 'Any special requests for your order...',
+    'checkout.card': 'Credit/Debit Card',
+    'checkout.cash': 'Cash on Delivery',
+    'checkout.cardnumber': 'Card Number',
+    'checkout.expiry': 'MM/YY',
+    'checkout.cvv': 'CVV',
+    'checkout.cardholder': 'Cardholder Name',
+    'checkout.placeorder': 'Place Order',
+    'checkout.processing': 'Processing...',
+    
+    // Categories
+    'category.all': 'All Pizzas',
+    'category.classic': 'Classic',
+    'category.gourmet': 'Gourmet',
+    'category.vegetarian': 'Vegetarian',
+    'category.specialty': 'Specialty',
+    
+    // Footer
+    'footer.description': 'Authentic Italian pizzas made with love and the finest ingredients. Family-owned since 1985, serving the community with traditional recipes and wood-fired perfection.',
+    'footer.contact': 'Contact Us',
+    'footer.hours': 'Hours',
+    'footer.hours.weekdays': 'Mon-Thu: 11AM-10PM',
+    'footer.hours.weekend': 'Fri-Sat: 11AM-11PM',
+    'footer.hours.sunday': 'Sunday: 12PM-9PM',
+    'footer.rights': '© 2024 Tony\'s Pizzeria. All rights reserved. | Privacy Policy | Terms of Service',
+    
+    // Common
+    'currency': 'MDL',
+    'loading': 'Loading...',
+    'error': 'Error',
+    'success': 'Success',
+  },
+  ro: {
+    // Header
+    'nav.home': 'Acasă',
+    'nav.menu': 'Meniu',
+    'nav.about': 'Despre',
+    'nav.contact': 'Contact',
+    'nav.signin': 'Conectare',
+    'nav.signup': 'Înregistrare',
+    
+    // Home page
+    'home.hero.title': 'Pizza Italiană Autentică',
+    'home.hero.subtitle': 'Livrată Proaspătă',
+    'home.hero.description': 'Perfecțiune la cuptor cu lemne, făcută cu dragoste și cele mai fine ingrediente. Rețete de familie transmise de generații.',
+    'home.hero.order': 'Comandă Acum',
+    'home.hero.story': 'Povestea Noastră',
+    'home.features.title': 'De Ce Tony\'s?',
+    'home.features.subtitle': 'Suntem dedicați să oferim cea mai bună experiență pizza cu ingrediente de calitate și servicii excepționale.',
+    'home.features.fast': 'Livrare Rapidă',
+    'home.features.fast.desc': 'Pizza caldă și proaspătă livrată în 30 de minute sau mai puțin',
+    'home.features.chefs': 'Bucătari Experți',
+    'home.features.chefs.desc': 'Rețete italiene autentice de la pizzaioli experimentați',
+    'home.features.quality': 'Calitate Premium',
+    'home.features.quality.desc': 'Doar cele mai fine ingrediente și aluat proaspăt zilnic',
+    'home.features.delivery': 'Livrare Gratuită',
+    'home.features.delivery.desc': 'Livrare gratuită pentru comenzi peste 500 MDL în zona noastră',
+    'home.featured.title': 'Pizza Recomandate',
+    'home.featured.subtitle': 'Încearcă cele mai populare pizza, iubite de clienți și create cu grijă.',
+    'home.featured.viewmenu': 'Vezi Meniul Complet',
+    'home.cta.title': 'Foame? Comandă Acum!',
+    'home.cta.subtitle': 'Pizza proaspătă și caldă livrată la ușa ta în 30 de minute sau mai puțin.',
+    'home.cta.start': 'Începe Comanda',
+    
+    // Menu page
+    'menu.title': 'Meniul Nostru',
+    'menu.subtitle': 'Descoperă selecția noastră delicioasă de pizza italiene autentice, făcute cu ingrediente proaspete și tehnici tradiționale.',
+    'menu.search': 'Caută pizza, ingrediente...',
+    'menu.showing': 'Se afișează',
+    'menu.pizzas': 'pizza',
+    'menu.pizza': 'pizza',
+    'menu.for': 'pentru',
+    'menu.in': 'în',
+    'menu.noresults': 'Nu s-au găsit pizza',
+    'menu.noresults.desc': 'Încearcă să ajustezi termenii de căutare sau filtrul de categorie.',
+    'menu.clear': 'Șterge Filtrele',
+    
+    // Pizza card
+    'pizza.ingredients': 'Ingrediente:',
+    'pizza.size': 'Mărime',
+    'pizza.small': 'Mică',
+    'pizza.medium': 'Medie',
+    'pizza.large': 'Mare',
+    'pizza.qty': 'Cant:',
+    'pizza.addtocart': 'Adaugă în Coș',
+    
+    // Cart
+    'cart.title': 'Coșul Tău',
+    'cart.empty': 'Coșul tău este gol',
+    'cart.empty.desc': 'Se pare că nu ai adăugat încă pizza delicioase în coș.',
+    'cart.browse': 'Răsfoiește Meniul',
+    'cart.items': 'Articole Comandă',
+    'cart.size': 'Mărime:',
+    'cart.each': 'bucata',
+    'cart.summary': 'Rezumatul Comenzii',
+    'cart.subtotal': 'Subtotal',
+    'cart.tax': 'Taxa',
+    'cart.delivery': 'Taxa de Livrare',
+    'cart.free': 'GRATUIT',
+    'cart.freedelivery': 'Livrare gratuită pentru comenzi peste 500 MDL',
+    'cart.total': 'Total',
+    'cart.checkout': 'Continuă la Plată',
+    'cart.continue': 'Continuă Cumpărăturile',
+    
+    // Auth
+    'auth.welcome': 'Bine ai revenit!',
+    'auth.signin.subtitle': 'Conectează-te la contul tău pentru a continua comanda',
+    'auth.signup.subtitle': 'Creează-ți contul pentru a începe să comanzi pizza delicioase',
+    'auth.email': 'Adresa de Email',
+    'auth.password': 'Parola',
+    'auth.confirmpassword': 'Confirmă Parola',
+    'auth.firstname': 'Prenume',
+    'auth.lastname': 'Nume',
+    'auth.phone': 'Număr de Telefon',
+    'auth.remember': 'Ține-mă minte',
+    'auth.forgot': 'Ai uitat parola?',
+    'auth.signin': 'Conectare',
+    'auth.signup': 'Înregistrare',
+    'auth.or': 'Sau continuă cu',
+    'auth.google': 'Google',
+    'auth.facebook': 'Facebook',
+    'auth.noaccount': 'Nu ai cont?',
+    'auth.hasaccount': 'Ai deja cont?',
+    'auth.signuphere': 'Înregistrează-te aici',
+    'auth.signinhere': 'Conectează-te aici',
+    'auth.guest': 'Continuă ca oaspete →',
+    
+    // Checkout
+    'checkout.title': 'Finalizare Comandă',
+    'checkout.contact': 'Informații de Contact',
+    'checkout.delivery': 'Adresa de Livrare',
+    'checkout.payment': 'Metoda de Plată',
+    'checkout.review': 'Revizuire Comandă',
+    'checkout.street': 'Adresa Străzii',
+    'checkout.city': 'Orașul',
+    'checkout.state': 'Statul/Regiunea',
+    'checkout.zip': 'Cod Poștal',
+    'checkout.instructions': 'Instrucțiuni Speciale',
+    'checkout.instructions.placeholder': 'Orice cerințe speciale pentru comanda ta...',
+    'checkout.card': 'Card de Credit/Debit',
+    'checkout.cash': 'Plată la Livrare',
+    'checkout.cardnumber': 'Numărul Cardului',
+    'checkout.expiry': 'LL/AA',
+    'checkout.cvv': 'CVV',
+    'checkout.cardholder': 'Numele Posesorului',
+    'checkout.placeorder': 'Plasează Comanda',
+    'checkout.processing': 'Se procesează...',
+    
+    // Categories
+    'category.all': 'Toate Pizza',
+    'category.classic': 'Clasice',
+    'category.gourmet': 'Gourmet',
+    'category.vegetarian': 'Vegetariene',
+    'category.specialty': 'Specialități',
+    
+    // Footer
+    'footer.description': 'Pizza italiene autentice făcute cu dragoste și cele mai fine ingrediente. Deținută de familie din 1985, servind comunitatea cu rețete tradiționale și perfecțiune la cuptor cu lemne.',
+    'footer.contact': 'Contactează-ne',
+    'footer.hours': 'Program',
+    'footer.hours.weekdays': 'Lun-Joi: 11:00-22:00',
+    'footer.hours.weekend': 'Vin-Sâm: 11:00-23:00',
+    'footer.hours.sunday': 'Duminică: 12:00-21:00',
+    'footer.rights': '© 2024 Tony\'s Pizzeria. Toate drepturile rezervate. | Politica de Confidențialitate | Termeni și Condiții',
+    
+    // Common
+    'currency': 'MDL',
+    'loading': 'Se încarcă...',
+    'error': 'Eroare',
+    'success': 'Succes',
+  },
+  ru: {
+    // Header
+    'nav.home': 'Главная',
+    'nav.menu': 'Меню',
+    'nav.about': 'О нас',
+    'nav.contact': 'Контакты',
+    'nav.signin': 'Войти',
+    'nav.signup': 'Регистрация',
+    
+    // Home page
+    'home.hero.title': 'Аутентичная Итальянская Пицца',
+    'home.hero.subtitle': 'Доставляется Свежей',
+    'home.hero.description': 'Совершенство дровяной печи, приготовленное с любовью и лучшими ингредиентами. Семейные рецепты, передаваемые поколениями.',
+    'home.hero.order': 'Заказать Сейчас',
+    'home.hero.story': 'Наша История',
+    'home.features.title': 'Почему Tony\'s?',
+    'home.features.subtitle': 'Мы стремимся предоставить лучший опыт пиццы с качественными ингредиентами и исключительным сервисом.',
+    'home.features.fast': 'Быстрая Доставка',
+    'home.features.fast.desc': 'Горячая и свежая пицца доставляется за 30 минут или меньше',
+    'home.features.chefs': 'Опытные Повара',
+    'home.features.chefs.desc': 'Аутентичные итальянские рецепты от опытных пиццайоло',
+    'home.features.quality': 'Премиум Качество',
+    'home.features.quality.desc': 'Только лучшие ингредиенты и свежее ежедневное тесто',
+    'home.features.delivery': 'Бесплатная Доставка',
+    'home.features.delivery.desc': 'Бесплатная доставка при заказе свыше 500 лей в нашей зоне',
+    'home.featured.title': 'Рекомендуемые Пиццы',
+    'home.featured.subtitle': 'Попробуйте наши самые популярные пиццы, любимые клиентами и приготовленные с заботой.',
+    'home.featured.viewmenu': 'Посмотреть Полное Меню',
+    'home.cta.title': 'Голодны? Заказывайте Сейчас!',
+    'home.cta.subtitle': 'Свежая, горячая пицца доставляется к вашей двери за 30 минут или меньше.',
+    'home.cta.start': 'Начать Заказ',
+    
+    // Menu page
+    'menu.title': 'Наше Меню',
+    'menu.subtitle': 'Откройте для себя наш восхитительный выбор аутентичных итальянских пицц, приготовленных из свежих ингредиентов и традиционных техник.',
+    'menu.search': 'Поиск пицц, ингредиентов...',
+    'menu.showing': 'Показано',
+    'menu.pizzas': 'пицц',
+    'menu.pizza': 'пицца',
+    'menu.for': 'для',
+    'menu.in': 'в',
+    'menu.noresults': 'Пиццы не найдены',
+    'menu.noresults.desc': 'Попробуйте изменить поисковые термины или фильтр категории.',
+    'menu.clear': 'Очистить Фильтры',
+    
+    // Pizza card
+    'pizza.ingredients': 'Ингредиенты:',
+    'pizza.size': 'Размер',
+    'pizza.small': 'Маленькая',
+    'pizza.medium': 'Средняя',
+    'pizza.large': 'Большая',
+    'pizza.qty': 'Кол-во:',
+    'pizza.addtocart': 'В Корзину',
+    
+    // Cart
+    'cart.title': 'Ваша Корзина',
+    'cart.empty': 'Ваша корзина пуста',
+    'cart.empty.desc': 'Похоже, вы еще не добавили вкусные пиццы в корзину.',
+    'cart.browse': 'Просмотреть Меню',
+    'cart.items': 'Товары Заказа',
+    'cart.size': 'Размер:',
+    'cart.each': 'штука',
+    'cart.summary': 'Итого по Заказу',
+    'cart.subtotal': 'Промежуточный итог',
+    'cart.tax': 'Налог',
+    'cart.delivery': 'Стоимость Доставки',
+    'cart.free': 'БЕСПЛАТНО',
+    'cart.freedelivery': 'Бесплатная доставка при заказе свыше 500 лей',
+    'cart.total': 'Итого',
+    'cart.checkout': 'Перейти к Оплате',
+    'cart.continue': 'Продолжить Покупки',
+    
+    // Auth
+    'auth.welcome': 'Добро пожаловать!',
+    'auth.signin.subtitle': 'Войдите в свой аккаунт, чтобы продолжить заказ',
+    'auth.signup.subtitle': 'Создайте аккаунт, чтобы начать заказывать вкусные пиццы',
+    'auth.email': 'Адрес Электронной Почты',
+    'auth.password': 'Пароль',
+    'auth.confirmpassword': 'Подтвердите Пароль',
+    'auth.firstname': 'Имя',
+    'auth.lastname': 'Фамилия',
+    'auth.phone': 'Номер Телефона',
+    'auth.remember': 'Запомнить меня',
+    'auth.forgot': 'Забыли пароль?',
+    'auth.signin': 'Войти',
+    'auth.signup': 'Регистрация',
+    'auth.or': 'Или продолжить с',
+    'auth.google': 'Google',
+    'auth.facebook': 'Facebook',
+    'auth.noaccount': 'Нет аккаунта?',
+    'auth.hasaccount': 'Уже есть аккаунт?',
+    'auth.signuphere': 'Зарегистрируйтесь здесь',
+    'auth.signinhere': 'Войдите здесь',
+    'auth.guest': 'Продолжить как гость →',
+    
+    // Checkout
+    'checkout.title': 'Оформление Заказа',
+    'checkout.contact': 'Контактная Информация',
+    'checkout.delivery': 'Адрес Доставки',
+    'checkout.payment': 'Способ Оплаты',
+    'checkout.review': 'Проверка Заказа',
+    'checkout.street': 'Адрес Улицы',
+    'checkout.city': 'Город',
+    'checkout.state': 'Штат/Регион',
+    'checkout.zip': 'Почтовый Индекс',
+    'checkout.instructions': 'Особые Инструкции',
+    'checkout.instructions.placeholder': 'Любые особые пожелания к вашему заказу...',
+    'checkout.card': 'Кредитная/Дебетовая Карта',
+    'checkout.cash': 'Оплата при Доставке',
+    'checkout.cardnumber': 'Номер Карты',
+    'checkout.expiry': 'ММ/ГГ',
+    'checkout.cvv': 'CVV',
+    'checkout.cardholder': 'Имя Держателя Карты',
+    'checkout.placeorder': 'Разместить Заказ',
+    'checkout.processing': 'Обработка...',
+    
+    // Categories
+    'category.all': 'Все Пиццы',
+    'category.classic': 'Классические',
+    'category.gourmet': 'Гурман',
+    'category.vegetarian': 'Вегетарианские',
+    'category.specialty': 'Фирменные',
+    
+    // Footer
+    'footer.description': 'Аутентичные итальянские пиццы, приготовленные с любовью и лучшими ингредиентами. Семейный бизнес с 1985 года, обслуживающий сообщество традиционными рецептами и совершенством дровяной печи.',
+    'footer.contact': 'Свяжитесь с Нами',
+    'footer.hours': 'Часы Работы',
+    'footer.hours.weekdays': 'Пн-Чт: 11:00-22:00',
+    'footer.hours.weekend': 'Пт-Сб: 11:00-23:00',
+    'footer.hours.sunday': 'Воскресенье: 12:00-21:00',
+    'footer.rights': '© 2024 Tony\'s Pizzeria. Все права защищены. | Политика Конфиденциальности | Условия Обслуживания',
+    
+    // Common
+    'currency': 'лей',
+    'loading': 'Загрузка...',
+    'error': 'Ошибка',
+    'success': 'Успех',
+  }
+};
+
+// Product translations - this would ideally come from the database
+const productTranslations = {
+  en: {
+    // Pizza names
+    'Margherita Classic': 'Margherita Classic',
+    'Pepperoni Supreme': 'Pepperoni Supreme',
+    'Quattro Stagioni': 'Quattro Stagioni',
+    'Prosciutto & Arugula': 'Prosciutto & Arugula',
+    'Vegetarian Garden': 'Vegetarian Garden',
+    'BBQ Chicken Ranch': 'BBQ Chicken Ranch',
+    'Mediterranean Delight': 'Mediterranean Delight',
+    'Meat Lovers': 'Meat Lovers',
+    
+    // Pizza descriptions
+    'Fresh mozzarella, San Marzano tomatoes, fresh basil, extra virgin olive oil': 'Fresh mozzarella, San Marzano tomatoes, fresh basil, extra virgin olive oil',
+    'Premium pepperoni, mozzarella cheese, tangy tomato sauce': 'Premium pepperoni, mozzarella cheese, tangy tomato sauce',
+    'Four seasons pizza with mushrooms, artichokes, ham, and olives': 'Four seasons pizza with mushrooms, artichokes, ham, and olives',
+    'Thinly sliced prosciutto, fresh arugula, cherry tomatoes, parmesan': 'Thinly sliced prosciutto, fresh arugula, cherry tomatoes, parmesan',
+    'Bell peppers, mushrooms, red onions, black olives, fresh tomatoes': 'Bell peppers, mushrooms, red onions, black olives, fresh tomatoes',
+    'Grilled chicken, BBQ sauce, red onions, cilantro, ranch drizzle': 'Grilled chicken, BBQ sauce, red onions, cilantro, ranch drizzle',
+    'Feta cheese, kalamata olives, sun-dried tomatoes, spinach, olive oil': 'Feta cheese, kalamata olives, sun-dried tomatoes, spinach, olive oil',
+    'Pepperoni, Italian sausage, bacon, ham, mozzarella cheese': 'Pepperoni, Italian sausage, bacon, ham, mozzarella cheese',
+    
+    // Categories
+    'Classic': 'Classic',
+    'Gourmet': 'Gourmet',
+    'Vegetarian': 'Vegetarian',
+    'Specialty': 'Specialty',
+    
+    // Ingredients
+    'Mozzarella': 'Mozzarella',
+    'San Marzano Tomatoes': 'San Marzano Tomatoes',
+    'Fresh Basil': 'Fresh Basil',
+    'Olive Oil': 'Olive Oil',
+    'Pepperoni': 'Pepperoni',
+    'Tomato Sauce': 'Tomato Sauce',
+    'Mushrooms': 'Mushrooms',
+    'Artichokes': 'Artichokes',
+    'Ham': 'Ham',
+    'Olives': 'Olives',
+    'Prosciutto': 'Prosciutto',
+    'Arugula': 'Arugula',
+    'Cherry Tomatoes': 'Cherry Tomatoes',
+    'Parmesan': 'Parmesan',
+    'Bell Peppers': 'Bell Peppers',
+    'Red Onions': 'Red Onions',
+    'Black Olives': 'Black Olives',
+    'Tomatoes': 'Tomatoes',
+    'Grilled Chicken': 'Grilled Chicken',
+    'BBQ Sauce': 'BBQ Sauce',
+    'Cilantro': 'Cilantro',
+    'Ranch': 'Ranch',
+    'Feta Cheese': 'Feta Cheese',
+    'Kalamata Olives': 'Kalamata Olives',
+    'Sun-dried Tomatoes': 'Sun-dried Tomatoes',
+    'Spinach': 'Spinach',
+    'Italian Sausage': 'Italian Sausage',
+    'Bacon': 'Bacon',
+  },
+  ro: {
+    // Pizza names
+    'Margherita Classic': 'Margherita Clasică',
+    'Pepperoni Supreme': 'Pepperoni Supreme',
+    'Quattro Stagioni': 'Quattro Stagioni',
+    'Prosciutto & Arugula': 'Prosciutto & Rucola',
+    'Vegetarian Garden': 'Grădina Vegetariană',
+    'BBQ Chicken Ranch': 'Pui BBQ Ranch',
+    'Mediterranean Delight': 'Deliciul Mediteranean',
+    'Meat Lovers': 'Iubitorii de Carne',
+    
+    // Pizza descriptions
+    'Fresh mozzarella, San Marzano tomatoes, fresh basil, extra virgin olive oil': 'Mozzarella proaspătă, roșii San Marzano, busuioc proaspăt, ulei de măsline extra virgin',
+    'Premium pepperoni, mozzarella cheese, tangy tomato sauce': 'Pepperoni premium, brânză mozzarella, sos de roșii picant',
+    'Four seasons pizza with mushrooms, artichokes, ham, and olives': 'Pizza patru anotimpuri cu ciuperci, anghinare, șuncă și măsline',
+    'Thinly sliced prosciutto, fresh arugula, cherry tomatoes, parmesan': 'Prosciutto feliat subțire, rucola proaspătă, roșii cherry, parmezan',
+    'Bell peppers, mushrooms, red onions, black olives, fresh tomatoes': 'Ardei grași, ciuperci, ceapă roșie, măsline negre, roșii proaspete',
+    'Grilled chicken, BBQ sauce, red onions, cilantro, ranch drizzle': 'Pui la grătar, sos BBQ, ceapă roșie, coriandru, sos ranch',
+    'Feta cheese, kalamata olives, sun-dried tomatoes, spinach, olive oil': 'Brânză feta, măsline kalamata, roșii uscate, spanac, ulei de măsline',
+    'Pepperoni, Italian sausage, bacon, ham, mozzarella cheese': 'Pepperoni, cârnat italian, bacon, șuncă, brânză mozzarella',
+    
+    // Categories
+    'Classic': 'Clasice',
+    'Gourmet': 'Gourmet',
+    'Vegetarian': 'Vegetariene',
+    'Specialty': 'Specialități',
+    
+    // Ingredients
+    'Mozzarella': 'Mozzarella',
+    'San Marzano Tomatoes': 'Roșii San Marzano',
+    'Fresh Basil': 'Busuioc Proaspăt',
+    'Olive Oil': 'Ulei de Măsline',
+    'Pepperoni': 'Pepperoni',
+    'Tomato Sauce': 'Sos de Roșii',
+    'Mushrooms': 'Ciuperci',
+    'Artichokes': 'Anghinare',
+    'Ham': 'Șuncă',
+    'Olives': 'Măsline',
+    'Prosciutto': 'Prosciutto',
+    'Arugula': 'Rucola',
+    'Cherry Tomatoes': 'Roșii Cherry',
+    'Parmesan': 'Parmezan',
+    'Bell Peppers': 'Ardei Grași',
+    'Red Onions': 'Ceapă Roșie',
+    'Black Olives': 'Măsline Negre',
+    'Tomatoes': 'Roșii',
+    'Grilled Chicken': 'Pui la Grătar',
+    'BBQ Sauce': 'Sos BBQ',
+    'Cilantro': 'Coriandru',
+    'Ranch': 'Ranch',
+    'Feta Cheese': 'Brânză Feta',
+    'Kalamata Olives': 'Măsline Kalamata',
+    'Sun-dried Tomatoes': 'Roșii Uscate',
+    'Spinach': 'Spanac',
+    'Italian Sausage': 'Cârnat Italian',
+    'Bacon': 'Bacon',
+  },
+  ru: {
+    // Pizza names
+    'Margherita Classic': 'Маргарита Классик',
+    'Pepperoni Supreme': 'Пепперони Суприм',
+    'Quattro Stagioni': 'Кватро Стаджони',
+    'Prosciutto & Arugula': 'Прошутто и Руккола',
+    'Vegetarian Garden': 'Вегетарианский Сад',
+    'BBQ Chicken Ranch': 'Курица BBQ Ранч',
+    'Mediterranean Delight': 'Средиземноморское Наслаждение',
+    'Meat Lovers': 'Мясная',
+    
+    // Pizza descriptions
+    'Fresh mozzarella, San Marzano tomatoes, fresh basil, extra virgin olive oil': 'Свежая моцарелла, помидоры Сан-Марцано, свежий базилик, оливковое масло экстра вирджин',
+    'Premium pepperoni, mozzarella cheese, tangy tomato sauce': 'Премиум пепперони, сыр моцарелла, острый томатный соус',
+    'Four seasons pizza with mushrooms, artichokes, ham, and olives': 'Пицца четыре сезона с грибами, артишоками, ветчиной и оливками',
+    'Thinly sliced prosciutto, fresh arugula, cherry tomatoes, parmesan': 'Тонко нарезанный прошутто, свежая руккола, помидоры черри, пармезан',
+    'Bell peppers, mushrooms, red onions, black olives, fresh tomatoes': 'Болгарский перец, грибы, красный лук, черные оливки, свежие помидоры',
+    'Grilled chicken, BBQ sauce, red onions, cilantro, ranch drizzle': 'Курица гриль, соус BBQ, красный лук, кинза, соус ранч',
+    'Feta cheese, kalamata olives, sun-dried tomatoes, spinach, olive oil': 'Сыр фета, оливки каламата, вяленые помидоры, шпинат, оливковое масло',
+    'Pepperoni, Italian sausage, bacon, ham, mozzarella cheese': 'Пепперони, итальянская колбаса, бекон, ветчина, сыр моцарелла',
+    
+    // Categories
+    'Classic': 'Классические',
+    'Gourmet': 'Гурман',
+    'Vegetarian': 'Вегетарианские',
+    'Specialty': 'Фирменные',
+    
+    // Ingredients
+    'Mozzarella': 'Моцарелла',
+    'San Marzano Tomatoes': 'Помидоры Сан-Марцано',
+    'Fresh Basil': 'Свежий Базилик',
+    'Olive Oil': 'Оливковое Масло',
+    'Pepperoni': 'Пепперони',
+    'Tomato Sauce': 'Томатный Соус',
+    'Mushrooms': 'Грибы',
+    'Artichokes': 'Артишоки',
+    'Ham': 'Ветчина',
+    'Olives': 'Оливки',
+    'Prosciutto': 'Прошутто',
+    'Arugula': 'Руккола',
+    'Cherry Tomatoes': 'Помидоры Черри',
+    'Parmesan': 'Пармезан',
+    'Bell Peppers': 'Болгарский Перец',
+    'Red Onions': 'Красный Лук',
+    'Black Olives': 'Черные Оливки',
+    'Tomatoes': 'Помидоры',
+    'Grilled Chicken': 'Курица Гриль',
+    'BBQ Sauce': 'Соус BBQ',
+    'Cilantro': 'Кинза',
+    'Ranch': 'Ранч',
+    'Feta Cheese': 'Сыр Фета',
+    'Kalamata Olives': 'Оливки Каламата',
+    'Sun-dried Tomatoes': 'Вяленые Помидоры',
+    'Spinach': 'Шпинат',
+    'Italian Sausage': 'Итальянская Колбаса',
+    'Bacon': 'Бекон',
+  }
+};
+
+const LanguageContext = createContext<LanguageContextType | null>(null);
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<Language>('ro');
+
+  const t = (key: string): string => {
+    return translations[language][key] || translations.en[key] || key;
+  };
+
+  const translateProduct = (product: any, field: string): string => {
+    const value = product[field];
+    if (!value) return '';
+    
+    // If it's an array (like ingredients), translate each item
+    if (Array.isArray(value)) {
+      return value.map(item => 
+        productTranslations[language][item] || productTranslations.en[item] || item
+      );
+    }
+    
+    // For single values (name, description, category)
+    return productTranslations[language][value] || productTranslations.en[value] || value;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t, translateProduct }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+}
